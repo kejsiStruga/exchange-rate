@@ -22,7 +22,6 @@ public class ExchangeRateService {
     private String flowRef = "EXR/";
     private String frequency = "D.";
 
-    // https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?startPeriod=2021-07-07&endPeriod=2021-07-08
     @Autowired
     private RestTemplate restTemplate;
     public String getECBReferenceRate(String currency) {
