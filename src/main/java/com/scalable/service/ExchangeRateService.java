@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,10 +30,6 @@ public class ExchangeRateService {
                 + currency.toUpperCase(Locale.ROOT)
                 + ".EUR.SP00.A?startPeriod=";
 
-        String pattern = "yyyy-MM-dd";
-
-        String startDate = getYesterdayDate();
-
         String uri = wsEntryPoint
                 + resource
                 + flowRef
@@ -48,10 +42,13 @@ public class ExchangeRateService {
         return restTemplate.getForObject(uri, String.class);
     }
 
-    public BigDecimal getECBReferenceRatePair(BigDecimal first_currency_euro_rate,
-                                              BigDecimal second_currency_euro_rate ) {
+    public double getECBReferenceRatePair(double first_currency_euro_rate,
+                                              double second_currency_euro_rate ) {
+        logger.info("First: " + first_currency_euro_rate);
+        logger.info("Second: " + second_currency_euro_rate);
 
-        return first_currency_euro_rate.divide(second_currency_euro_rate, RoundingMode.CEILING);
+        logger.info("Divide: " + first_currency_euro_rate/second_currency_euro_rate);
+        return second_currency_euro_rate/first_currency_euro_rate;
     }
 
     public String getListOfSupportedCurrencies() {

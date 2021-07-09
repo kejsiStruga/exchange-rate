@@ -5,10 +5,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -23,7 +24,7 @@ public class ExchangeRateController {
     }
 
     @GetMapping(value = "/getECBReferenceRate/{currency}")
-    public BigDecimal getECBReferenceRate(@PathVariable String currency) {
+    public double getECBReferenceRate(@PathVariable String currency) {
         String jsonResults = exchangeRateService.getECBReferenceRate(currency);
 
         JSONObject jsonObject = new JSONObject(jsonResults);
@@ -35,20 +36,21 @@ public class ExchangeRateController {
                 .getJSONObject("0:0:0:0:0")
                 .getJSONObject("observations")
                 .getJSONArray("0")
-                .get(0));
+                .get(0)).doubleValue();
 
     }
 
     @GetMapping(value = "/getECBReferenceRatePair/{first_currency}/{second_currency}")
-    public BigDecimal getECBReferenceRatePair(@PathVariable String first_currency,
+    public double getECBReferenceRatePair(@PathVariable String first_currency,
                                           @PathVariable String second_currency) {
-        BigDecimal first_currency_euro_rate = BigDecimal.ONE;
-        BigDecimal second_currency_euro_rate = BigDecimal.ONE;
+        double first_currency_euro_rate = 1.0;
+        double second_currency_euro_rate = 1.0;
 
         if (!first_currency.equalsIgnoreCase("EUR")) {
             first_currency_euro_rate = getECBReferenceRate(first_currency.toUpperCase(Locale.ROOT));
-        } else if (!second_currency.equalsIgnoreCase("EUR")) {
-            first_currency_euro_rate = getECBReferenceRate(first_currency.toUpperCase(Locale.ROOT));
+        }
+        if (!second_currency.equalsIgnoreCase("EUR")) {
+            second_currency_euro_rate = getECBReferenceRate(second_currency.toUpperCase(Locale.ROOT));
         }
 
         return exchangeRateService
@@ -77,23 +79,21 @@ public class ExchangeRateController {
     }
 
     @GetMapping(value = "/getConvertedAmount/{amount}/{from_currency}/{to_currency}")
-    public BigDecimal getConvertedAmount(@PathVariable String amount,
+    public double getConvertedAmount(@PathVariable String amount,
                                    @PathVariable String from_currency,
                                    @PathVariable String to_currency){
         double doubleConvertedAmount = Double.parseDouble(amount);
-        BigDecimal rate;
+        double rate;
 
         if (from_currency.equals("EUR")) {
             rate = getECBReferenceRate(to_currency);
         } else if (to_currency.equals("EUR")) {
-            rate = getECBReferenceRate(from_currency)
-                    .pow(-1, MathContext.DECIMAL64)
-                    .round(new MathContext(4, RoundingMode.HALF_UP));
+            rate = Math.pow(getECBReferenceRate(from_currency), -1);
         } else {
             rate = getECBReferenceRatePair(from_currency, to_currency);
         }
 
-        return new BigDecimal(doubleConvertedAmount).multiply(rate);
+        return doubleConvertedAmount*rate;
 
     }
 
