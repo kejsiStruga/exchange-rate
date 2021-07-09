@@ -17,7 +17,7 @@ public class Config {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("com.scalable.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

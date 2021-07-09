@@ -29,7 +29,7 @@ public class ExchangeRateController {
         JSONObject jsonObject = new JSONObject(jsonResults);
         JSONArray dataSetsArray = jsonObject.getJSONArray("dataSets");
 
-        BigDecimal referenceRate = ((BigDecimal) dataSetsArray
+        return ((BigDecimal) dataSetsArray
                 .getJSONObject(0)
                 .getJSONObject("series")
                 .getJSONObject("0:0:0:0:0")
@@ -37,7 +37,6 @@ public class ExchangeRateController {
                 .getJSONArray("0")
                 .get(0));
 
-        return referenceRate;
     }
 
     @GetMapping(value = "/getECBReferenceRatePair/{first_currency}/{second_currency}")
@@ -76,14 +75,12 @@ public class ExchangeRateController {
     public BigDecimal getConvertedAmount(@PathVariable String amount,
                                    @PathVariable String from_currency,
                                    @PathVariable String to_currency){
-        Double doubleConvertedAmount = Double.parseDouble(amount);
+        double doubleConvertedAmount = Double.parseDouble(amount);
         BigDecimal rate;
 
         if (from_currency.equals("EUR")) {
             rate = getECBReferenceRate(to_currency);
-            logger.info("from_currency is EUR");
         } else if (to_currency.equals("EUR")) {
-            logger.info("to_currency is EUR");
             rate = getECBReferenceRate(from_currency)
                     .pow(-1, MathContext.DECIMAL64)
                     .round(new MathContext(4, RoundingMode.HALF_UP));
@@ -91,9 +88,8 @@ public class ExchangeRateController {
             rate = getECBReferenceRatePair(from_currency, to_currency);
         }
 
-        BigDecimal convertedAmount = new BigDecimal(doubleConvertedAmount).multiply(rate);
+        return new BigDecimal(doubleConvertedAmount).multiply(rate);
 
-        return convertedAmount;
     }
 
 }
