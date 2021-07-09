@@ -45,17 +45,13 @@ public class ExchangeRateService {
 
         logger.info("URI: " + uri);
 
-        String result = restTemplate.getForObject(uri, String.class);
-
-        return result;
+        return restTemplate.getForObject(uri, String.class);
     }
 
     public BigDecimal getECBReferenceRatePair(BigDecimal first_currency_euro_rate,
                                               BigDecimal second_currency_euro_rate ) {
 
-        BigDecimal rate = first_currency_euro_rate.divide(second_currency_euro_rate, RoundingMode.CEILING);
-
-        return rate;
+        return first_currency_euro_rate.divide(second_currency_euro_rate, RoundingMode.CEILING);
     }
 
     public String getListOfSupportedCurrencies() {
@@ -72,9 +68,7 @@ public class ExchangeRateService {
 
         logger.info(uri);
 
-        String result = restTemplate.getForObject(uri, String.class);
-
-        return result;
+        return restTemplate.getForObject(uri, String.class);
     }
 
     private String getYesterdayDate(){
@@ -91,9 +85,7 @@ public class ExchangeRateService {
     private String getToday() {
         String pattern = "yyyy-MM-dd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        String endDate = simpleDateFormat.format(new Date());
-
-        return endDate;
+        return simpleDateFormat.format(new Date());
     }
 
 }

@@ -42,9 +42,14 @@ public class ExchangeRateController {
     @GetMapping(value = "/getECBReferenceRatePair/{first_currency}/{second_currency}")
     public BigDecimal getECBReferenceRatePair(@PathVariable String first_currency,
                                           @PathVariable String second_currency) {
+        BigDecimal first_currency_euro_rate = BigDecimal.ONE;
+        BigDecimal second_currency_euro_rate = BigDecimal.ONE;
 
-        BigDecimal first_currency_euro_rate = getECBReferenceRate(first_currency.toUpperCase(Locale.ROOT));
-        BigDecimal second_currency_euro_rate = getECBReferenceRate(second_currency.toUpperCase(Locale.ROOT));
+        if (!first_currency.equalsIgnoreCase("EUR")) {
+            first_currency_euro_rate = getECBReferenceRate(first_currency.toUpperCase(Locale.ROOT));
+        } else if (!second_currency.equalsIgnoreCase("EUR")) {
+            first_currency_euro_rate = getECBReferenceRate(first_currency.toUpperCase(Locale.ROOT));
+        }
 
         return exchangeRateService
                 .getECBReferenceRatePair(first_currency_euro_rate, second_currency_euro_rate);
